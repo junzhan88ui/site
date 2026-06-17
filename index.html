@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Serif+SC:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-surface: #111111;
+      --accent: #e8c547;
+      --accent-dim: #b89a2e;
+      --text-primary: #f0ece4;
+      --text-muted: #6a6560;
+      --text-subtle: #3a3835;
+      --border: #222;
+      --radius: 2px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--text-subtle) var(--bg);
+    }
+
+    body {
+      font-family: 'DM Mono', 'Noto Serif SC', monospace;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.7);
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 0.8s ease forwards;
+    }
+
+    .nav-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-left {
+      animation: fadeUp 1s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    .hero-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      line-height: 1.9;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      background: transparent;
+      border: 1px solid var(--accent-dim);
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      transition: left 0.4s ease;
+      z-index: -1;
+    }
+
+    .hero-cta:hover {
+      color: var(--bg);
+    }
+
+    .hero-cta:hover::before {
+      left: 0;
+    }
+
+    .hero-cta svg {
+      transition: transform 0.3s ease;
+    }
+
+    .hero-cta:hover svg {
+      transform: translateX(4px);
+    }
+
+    .hero-right {
+      position: relative;
+      animation: fadeUp 1s ease 0.6s forwards;
+      opacity: 0;
+    }
+
+    .hero-visual {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(232, 197, 71, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 70%, rgba(232, 197, 71, 0.04) 0%, transparent 50%);
+    }
+
+    .hero-visual-inner {
+      position: absolute;
+      inset: 2rem;
+      border: 1px solid var(--text-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+    }
+
+    .visual-number {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(6rem, 12vw, 12rem);
+      color: var(--text-subtle);
+      position: absolute;
+      top: -0.5rem;
+      left: -0.3rem;
+      line-height: 1;
+      opacity: 0.3;
+    }
+
+    .visual-text {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+    }
+
+    .visual-text span {
+      color: var(--accent);
+    }
+
+    /* ===== SECTION COMMON ===== */
+    section {
+      padding: 8rem 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      margin-bottom: 5rem;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    /* ===== ABOUT ===== */
+    #about {
+      border-top: 1px solid var(--border);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 6rem;
+    }
+
+    .about-text p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p:first-child::first-letter {
+      font-family: 'Instrument Serif', serif;
+      font-size: 3.5rem;
+      float: left;
+      margin-right: 0.5rem;
+      margin-top: 0.1rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-content: start;
+    }
+
+    .stat-card {
+      padding: 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      transition: border-color 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent-dim);
+    }
+
+    .stat-number {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.5rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+    }
+
+    /* ===== SKILLS ===== */
+    #skills {
+      border-top: 1px solid var(--border);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .skill-card {
+      padding: 2.5rem;
+      background: var(--bg);
+      position: relative;
+      transition: background 0.4s ease;
+    }
+
+    .skill-card:hover {
+      background: var(--bg-surface);
+    }
+
+    .skill-card::before {
+      content: attr(data-index);
+      font-family: 'Instrument Serif', serif;
+      font-size: 4rem;
+      color: var(--text-subtle);
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      opacity: 0.2;
+    }
+
+    .skill-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+    }
+
+    .skill-title {
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .skill-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* ===== PROJECTS ===== */
+    #projects {
+      border-top: 1px solid var(--border);
+    }
+
+    .project-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-item {
+      display: grid;
+      grid-template-columns: 0.3fr 1fr 1.5fr auto;
+      gap: 3rem;
+      align-items: center;
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .project-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+
+    .project-item:hover {
+      padding-left: 1rem;
+    }
+
+    .project-item:hover .project-name {
+      color: var(--accent);
+    }
+
+    .project-year {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .project-name {
+      font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+      font-size: 1.6rem;
+      transition: color 0.3s ease;
+    }
+
+    .project-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .project-tag {
+      font-size: 0.65rem;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--text-subtle);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== CONTACT ===== */
+    #contact {
+      border-top: 1px solid var(--border);
+      padding-bottom: 4rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+    }
+
+    .contact-text {
+      font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .contact-text em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      justify-content: center;
+    }
+
+    .contact-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .contact-link:first-child {
+      border-top: 1px solid var(--border);
+    }
+
+    .contact-link:hover {
+      padding-left: 1rem;
+      color: var(--accent);
+    }
+
+    .contact-link-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+    }
+
+    .contact-link-value {
+      font-size: 0.9rem;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    footer a {
+      color: var(--accent-dim);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    /* ===== SCROLL ANIMATIONS ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== KEYFRAMES ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+
+      .hero { padding: 0 1.5rem; }
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding-top: 6rem;
+      }
+      .hero-right { display: none; }
+
+      section { padding: 5rem 1.5rem; }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-item {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      .project-tags { justify-content: flex-start; }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+
+    /* ===== CUSTOM SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--text-subtle); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ===== CURSOR DOT ===== */
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: difference;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor-dot" id="cursor"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">My Space.</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="hero-label">Developer / Creator</div>
+        <h1 class="hero-title">在代码中<br>构建<em>自己的</em><br>世界</h1>
+        <p class="hero-desc">
+          一个正在成长中的开发者，用 Cloudflare 生态打造轻量、快速、优雅的 Web 应用。从零开始，一步步向前。
+        </p>
+        <a href="#projects" class="hero-cta">
+          查看项目
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+      <div class="hero-right">
+        <div class="hero-visual">
+          <div class="hero-visual-inner">
+            <span class="visual-number">01</span>
+            <div class="visual-text">
+              Currently building with <span>Cloudflare</span><br>
+              Learning by shipping
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <div class="section-label">About</div>
+      <h2 class="section-title">关于我</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>
+          从部署第一个静态站点开始，到学会使用 Cloudflare Workers 构建后端 API，我在不断探索全栈开发的每一个环节。不追求速成，而是通过实际项目来扎实地掌握每一项技术。
+        </p>
+        <p>
+          相信好的软件来自对细节的执着和对用户需求的深刻理解。每一行代码都应该有它存在的理由。目前专注于 Web 全栈开发，对边缘计算和 Serverless 架构特别感兴趣。
+        </p>
+        <p>
+          在业余时间研究新的技术框架、记录学习笔记、打磨个人项目。目标是构建真正对人有用的工具。
+        </p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat-card">
+          <div class="stat-number">01</div>
+          <div class="stat-label">年开发经验</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">03</div>
+          <div class="stat-label">已完成项目</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">学习热情</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">投入程度</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <div class="section-label">Skills</div>
+      <h2 class="section-title">技术栈</h2>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-card" data-index="01">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+        </svg>
+        <div class="skill-title">Frontend</div>
+        <div class="skill-desc">HTML / CSS / JavaScript / React，构建响应式、交互友好的用户界面</div>
+      </div>
+      <div class="skill-card" data-index="02">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/>
+        </svg>
+        <div class="skill-title">Backend</div>
+        <div class="skill-desc">Cloudflare Workers / Hono / Node.js，构建轻量高性能的服务端应用</div>
+      </div>
+      <div class="skill-card" data-index="03">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>
+        </svg>
+        <div class="skill-title">Database</div>
+        <div class="skill-desc">Cloudflare D1 / KV / R2，使用边缘数据库实现全球低延迟数据访问</div>
+      </div>
+      <div class="skill-card" data-index="04">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>
+        </svg>
+        <div class="skill-title">Deployment</div>
+        <div class="skill-desc">Cloudflare Pages / Wrangler CLI / Git，实现自动化构建与全球分发部署</div>
+      </div>
+      <div class="skill-card" data-index="05">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/>
+        </svg>
+        <div class="skill-title">Design</div>
+        <div class="skill-desc">注重排版、留白与动效细节，追求代码与视觉的双重品质</div>
+      </div>
+      <div class="skill-card" data-index="06">
+        <svg class="skill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+        </svg>
+        <div class="skill-title">Learning</div>
+        <div class="skill-desc">保持好奇心，持续学习新工具与新范式，在实践中快速迭代成长</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <div class="section-label">Projects</div>
+      <h2 class="section-title">项目经历</h2>
+    </div>
+    <div class="project-list reveal">
+      <a class="project-item" href="#">
+        <span class="project-year">2025</span>
+        <span class="project-name">个人主页</span>
+        <span class="project-desc">你正在看的这个站点，部署在 Cloudflare Pages 上</span>
+        <span class="project-tags">
+          <span class="project-tag">HTML</span>
+          <span class="project-tag">CSS</span>
+          <span class="project-tag">Pages</span>
+        </span>
+      </a>
+      <a class="project-item" href="#">
+        <span class="project-year">2025</span>
+        <span class="project-name">待办应用</span>
+        <span class="project-desc">一个简洁的待办清单，使用 Workers + D1 构建</span>
+        <span class="project-tags">
+          <span class="project-tag">Workers</span>
+          <span class="project-tag">D1</span>
+          <span class="project-tag">React</span>
+        </span>
+      </a>
+      <a class="project-item" href="#">
+        <span class="project-year">2025</span>
+        <span class="project-name">短链服务</span>
+        <span class="project-desc">基于 KV 的短链接生成器，支持访问统计</span>
+        <span class="project-tags">
+          <span class="project-tag">Workers</span>
+          <span class="project-tag">KV</span>
+          <span class="project-tag">API</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-header reveal">
+      <div class="section-label">Contact</div>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-text">
+        有想法？<br>一起<em>聊聊</em>
+      </div>
+      <div class="contact-links">
+        <a href="mailto:your@email.com" class="contact-link">
+          <span class="contact-link-label">Email</span>
+          <span class="contact-link-value">your@email.com</span>
+        </a>
+        <a href="https://github.com/yourusername" class="contact-link" target="_blank">
+          <span class="contact-link-label">GitHub</span>
+          <span class="contact-link-value">github.com/yourusername</span>
+        </a>
+        <a href="https://twitter.com/yourusername" class="contact-link" target="_blank">
+          <span class="contact-link-label">Twitter / X</span>
+          <span class="contact-link-value">@yourusername</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2025 My Space. Built with care.</span>
+    <span>Deployed on <a href="https://pages.cloudflare.com" target="_blank">Cloudflare Pages</a></span>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, i * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX - 4 + 'px';
+      cursor.style.top = e.clientY - 4 + 'px';
+    });
+
+    // Hide cursor on mobile
+    if ('ontouchstart' in window) {
+      cursor.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
